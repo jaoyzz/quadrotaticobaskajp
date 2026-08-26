@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Basket Tactic Board Pro</title>
+<style>
+:root{
+  --bg:#7a8d58;
+  --panel:#6f814f;
+  --panel2:#68794a;
+  --gold:#d29a3e;
+  --gold2:#c99235;
+  --white:#fff;
+  --ink:#30352a;
+  --blue:#304e9f;
+  --green:#23d331;
+  --red:#df3434;
+  --purple:#8031e0;
+}
+*{box-sizing:border-box}
+html,body{width:100%;height:100%;margin:0}
+body{
+  overflow:hidden;
+  font-family:Arial,Helvetica,sans-serif;
+  background:var(--bg);
+  color:#273022;
+  user-select:none;
+}
+button,input{font:inherit}
+.app{
+  width:100vw;height:100vh;
+  display:grid;
+  grid-template-columns:58px 1fr;
+  grid-template-rows:58px 1fr 74px;
+}
+.topbar{
+  grid-column:2;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  padding:8px 12px;
+  background:rgba(89,105,62,.34);
+}
+.brand{
+  font-weight:800;
+  letter-spacing:.8px;
+  font-size:17px;
+  color:#eef3df;
+  margin-right:8px;
+}
+.top-tools,.right-tools{display:flex;align-items:center;gap:5px}
+.right-tools{margin-left:auto}
+.tool,.side-btn,.bottom-btn{
+  width:40px;height:38px;border:0;
+  background:#c69a3a;
+  color:#43502e;
+  cursor:pointer;
+  display:grid;place-items:center;
+  transition:.15s;
+}
+.tool:hover,.side-btn:hover,.bottom-btn:hover{filter:brightness(1.08)}
+.tool.active{background:#e1b64c;box-shadow:inset 0 -3px #4c5a35}
+.tool svg,.side-btn svg,.bottom-btn svg{width:22px;height:22px}
+.login{
+  border:0;background:#d0a23f;color:#344028;
+  padding:9px 15px;font-size:16px;cursor:pointer;
+}
+.sidebar{
+  grid-column:1;grid-row:1/4;
+  background:#71834f;
+  display:flex;flex-direction:column;align-items:center;
+  padding-top:17px;gap:8px;
+}
+.side-btn{
+  width:42px;height:42px;
+  background:#c69a3a;
+}
+.side-spacer{height:18px}
+.help{
+  margin-top:4px;background:#19a9d7;color:white;border-radius:50%;
+  width:38px;height:38px;font-size:24px;font-weight:700;
+}
+.pro{
+  margin-top:14px;
+  background:#75c61d;color:#36531c;
+  border-radius:10px;font-size:11px;font-weight:900;
+}
+.workspace{
+  grid-column:2;grid-row:2;
+  position:relative;
+  background:rgba(90,107,63,.28);
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+  padding:18px;
+}
+.board-wrap{
+  position:relative;
+  width:min(92vw,1220px);
+  aspect-ratio:2/1;
+  max-height:calc(100vh - 170px);
+  background:#d39a42;
+  border:2px solid #f8f8ee;
+  box-shadow:0 12px 30px rgba(35,42,25,.16);
+}
+canvas{display:block;width:100%;height:100%}
+.board-title{
+  position:absolute;left:14px;top:10px;
+  color:rgba(255,255,255,.8);font-size:11px;
+  letter-spacing:1px;pointer-events:none;
+}
+.status{
+  position:absolute;right:14px;top:10px;
+  color:rgba(255,255,255,.65);font-size:11px;
+  pointer-events:none;
+}
+.bottom{
+  grid-column:2;grid-row:3;
+  display:flex;align-items:center;
+  padding:8px 14px;
+  gap:14px;
+  background:rgba(91,106,64,.30);
+}
+.players{
+  display:flex;align-items:center;gap:6px;
+  min-width:0;
+}
+.player{
+  width:34px;height:34px;border-radius:50%;
+  display:grid;place-items:center;
+  border:2px solid rgba(255,255,255,.65);
+  font-weight:800;font-size:14px;
+  color:white;cursor:pointer;
+  box-shadow:0 2px 4px rgba(0,0,0,.16);
+}
+.player:hover{transform:translateY(-2px)}
+.p-red{background:#9e2c2c}.p-yellow{background:#f4df00;color:#333}
+.p-purple{background:#8032d9}.p-green{background:#18c92d;color:#063b0b}
+.p-blue{background:#2f59a6}.p-orange{background:#dc6d38}
+.p-cyan{background:#1c9fc4}.p-white{background:#eee;color:#333}
+.p-black{background:#242424}
+.palette{
+  display:flex;gap:6px;align-items:center;
+}
+.dot{
+  width:19px;height:19px;border-radius:50%;border:0;cursor:pointer;
+}
+.d-yellow{background:#f2bb27}.d-red{background:#df3434}.d-black{background:#263047}
+.d-blue{background:#2e57d2}.d-orange{background:#e47725}
+.bottom-actions{
+  margin-left:auto;display:flex;align-items:center;gap:4px;
+}
+.bottom-btn{
+  width:40px;height:38px;
+}
+.zoom{
+  width:110px;
+  accent-color:#4a5ba7;
+}
+.modal{
+  position:fixed;inset:0;background:rgba(0,0,0,.48);
+  display:none;align-items:center;justify-content:center;z-index:50;
+}
+.modal.open{display:flex}
+.modal-card{
+  width:min(430px,92vw);background:#f1eee5;
+  border-radius:12px;padding:22px;
+  box-shadow:0 20px 60px rgba(0,0,0,.3);
+}
+.modal-card h2{margin:0 0 16px}
+.modal-row{display:flex;gap:8px;margin:10px 0}
+.modal-row button{
+  flex:1;padding:11px;border:0;background:#d09b3f;cursor:pointer
+}
+.modal-card .close{
+  width:100%;margin-top:10px;background:#555;color:#fff;
+}
+.hint{
+  position:absolute;left:50%;bottom:8px;transform:translateX(-50%);
+  background:rgba(35,42,25,.45);color:#f5f3e8;
+  padding:5px 10px;border-radius:20px;font-size:11px;
+  pointer-events:none;opacity:0;transition:.2s;
+}
+.hint.show{opacity:1}
+@media(max-width:900px){
+  .app{grid-template-columns:48px 1fr;grid-template-rows:50px 1fr 66px}
+  .topbar{padding:5px}.brand{display:none}
+  .tool{width:35px;height:34px}.sidebar{padding-top:10px}
+  .side-btn{width:36px;height:36px}.bottom{padding:6px;gap:7px}
+  .player{width:30px;height:30px}.players{gap:3px}
+  .bottom-actions .bottom-btn{width:34px}
+  .palette{display:none}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside class="sidebar">
+    <button class="side-btn" id="menuBtn" title="Menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <button class="side-btn" title="Quadro" onclick="resetView()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16"/><path d="M8 8h8v8H8zM12 4v16M4 12h16"/></svg>
+    </button>
+    <button class="side-btn" title="Cores" onclick="showHelp('Escolha uma cor no rodapé e clique em um jogador para alterar sua cor.')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="#e54"/><circle cx="8" cy="9" r="2" fill="#fff"/><circle cx="15" cy="7" r="2" fill="#fff"/><circle cx="17" cy="14" r="2" fill="#fff"/></svg>
+    </button>
+    <button class="side-btn" title="Tela cheia" onclick="toggleFullscreen()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg>
+    </button>
+    <div class="side-spacer"></div>
+    <button class="side-btn help" onclick="showHelp()">?</button>
+    <button class="side-btn pro" onclick="showHelp('Basket Tactic Board Pro — quadro tático profissional para criar jogadas.')">PRO</button>
+  </aside>
+
+  <header class="topbar">
+    <div class="brand">BASKET TACTIC BOARD</div>
+    <div class="top-tools">
+      <button class="tool" title="Compartilhar link" onclick="copyBoard()" aria-label="Compartilhar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.1.1l2-2a5 5 0 0 0-7.1-7.1l-1.1 1.1"/><path d="M14 11a5 5 0 0 0-7.1-.1l-2 2A5 5 0 0 0 7 20l1.1-1.1"/></svg>
+      </button>
+      <button class="tool" title="Exportar PNG" onclick="exportPNG()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12M7 10l5 5 5-5M4 20h16"/></svg>
+      </button>
+      <button class="tool" title="Limpar desenho" onclick="clearDrawings()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="7" width="12" height="14"/><path d="M4 7h16M9 3h6M10 11v6M14 11v6"/></svg>
+      </button>
+      <button class="tool" id="saveBtn" title="Salvar" onclick="saveBoard()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h12l3 3v13H5z"/><path d="M8 4v6h8V4M8 20v-6h8v6"/></svg>
+      </button>
+      <button class="tool" title="Abrir" onclick="loadBoard()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h6l2 2h8v11H4z"/></svg>
+      </button>
+      <button class="tool" title="Ajuda" onclick="showHelp()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 4 2c-1 .8-1.5 1.2-1.5 2.5M12 17h.01"/></svg>
+      </button>
+    </div>
+    <div class="right-tools">
+      <button class="login" onclick="showHelp('A área de login pode ser conectada a um banco de dados futuramente.')">Entrar</button>
+    </div>
+  </header>
+
+  <main class="workspace" id="workspace">
+    <div class="board-wrap" id="boardWrap">
+      <canvas id="court"></canvas>
+      <div class="board-title">TACTIC BOARD • BASKETBALL</div>
+      <div class="status" id="status">SELECIONAR</div>
+      <div class="hint" id="hint"></div>
+    </div>
+  </main>
+
+  <footer class="bottom">
+    <div class="players" id="players"></div>
+
+    <div class="palette">
+      <button class="dot d-yellow" title="Amarelo" onclick="setSelectedColor('#f2bb27')"></button>
+      <button class="dot d-red" title="Vermelho" onclick="setSelectedColor('#df3434')"></button>
+      <button class="dot d-black" title="Preto" onclick="setSelectedColor('#263047')"></button>
+      <button class="dot d-blue" title="Azul" onclick="setSelectedColor('#2e57d2')"></button>
+      <button class="dot d-orange" title="Laranja" onclick="setSelectedColor('#e47725')"></button>
+    </div>
+
+    <div class="bottom-actions">
+      <button class="bottom-btn" title="Selecionar" onclick="setTool('select')">↖</button>
+      <button class="bottom-btn" title="Linha" onclick="setTool('line')">━</button>
+      <button class="bottom-btn" title="Seta" onclick="setTool('arrow')">➜</button>
+      <button class="bottom-btn" title="Caneta" onclick="setTool('pen')">〰</button>
+      <button class="bottom-btn" title="Borracha" onclick="setTool('erase')">⌫</button>
+      <input class="zoom" id="zoom" type="range" min="80" max="120" value="100" title="Zoom">
+      <button class="bottom-btn" title="Desfazer" onclick="undo()">↶</button>
+      <button class="bottom-btn" title="Refazer" onclick="redo()">↷</button>
+      <button class="bottom-btn" title="Apagar tudo" onclick="resetBoard()">⊘</button>
+    </div>
+  </footer>
+</div>
+
+<div class="modal" id="modal">
+  <div class="modal-card">
+    <h2>Basket Tactic Board Pro</h2>
+    <p>Crie jogadas arrastando jogadores, desenhando linhas e setas diretamente na quadra.</p>
+    <div class="modal-row">
+      <button onclick="setTool('select');closeModal()">Selecionar</button>
+      <button onclick="setTool('arrow');closeModal()">Seta</button>
+      <button onclick="setTool('line');closeModal()">Linha</button>
+    </div>
+    <div class="modal-row">
+      <button onclick="saveBoard();closeModal()">Salvar</button>
+      <button onclick="exportPNG();closeModal()">Exportar PNG</button>
+    </div>
+    <button class="modal-row close" onclick="closeModal()">Fechar</button>
+  </div>
+</div>
+
+<script>
+const canvas = document.getElementById('court');
+const ctx = canvas.getContext('2d');
+const wrap = document.getElementById('boardWrap');
+const statusEl = document.getElementById('status');
+const playersEl = document.getElementById('players');
+const hintEl = document.getElementById('hint');
+
+let W=1200,H=600, dpr=window.devicePixelRatio||1;
+let tool='select', selectedPlayer=null, selectedColor='#2f59a6';
+let drawings=[], history=[], future=[];
+let drag=null, current=null, zoom=1;
+
+const players=[
+  {id:1,n:1,x:.18,y:.50,c:'#9e2c2c'},
+  {id:2,n:2,x:.28,y:.36,c:'#f4df00'},
+  {id:3,n:3,x:.31,y:.64,c:'#8032d9'},
+  {id:4,n:4,x:.44,y:.42,c:'#18c92d'},
+  {id:5,n:5,x:.48,y:.68,c:'#2f59a6'}
+];
+
+function resize(){
+  const r=wrap.getBoundingClientRect();
+  W=Math.max(800,Math.round(r.width));
+  H=Math.max(400,Math.round(r.height));
+  canvas.width=W*dpr; canvas.height=H*dpr;
+  canvas.style.width=W+'px'; canvas.style.height=H+'px';
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  draw();
+}
+window.addEventListener('resize',resize);
+
+function drawCourt(){
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#d39a42';ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle='#fff';ctx.lineWidth=2;
+  ctx.strokeRect(1,1,W-2,H-2);
+
+  const cx=W/2, cy=H/2;
+  ctx.beginPath();ctx.moveTo(cx,0);ctx.lineTo(cx,H);ctx.stroke();
+
+  const r=Math.min(H*.24, W*.15);
+  ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke();
+
+  const keyW=W*.19,keyH=H*.50;
+  const leftX=0,rightX=W-keyW,keyY=cy-keyH/2;
+  ctx.strokeRect(leftX,keyY,keyW,keyH);
+  ctx.strokeRect(rightX,keyY,keyW,keyH);
+
+  const arcR=H*.17;
+  ctx.beginPath();ctx.arc(leftX+keyW,cy,arcR,-Math.PI/2,Math.PI/2);ctx.stroke();
+  ctx.beginPath();ctx.arc(rightX,cy,arcR,Math.PI/2,Math.PI*1.5);ctx.stroke();
+
+  const threeR=H*.43;
+  ctx.beginPath();
+  ctx.moveTo(leftX,cy-threeR*.67);
+  ctx.lineTo(W*.10,cy-threeR*.67);
+  ctx.arc(W*.10,cy,threeR,-Math.PI/2,Math.PI/2);
+  ctx.lineTo(leftX,cy+threeR*.67);
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.moveTo(W,cy-threeR*.67);
+  ctx.lineTo(W-W*.10,cy-threeR*.67);
+  ctx.arc(W-W*.10,cy,threeR,Math.PI*1.5,Math.PI/2,true);
+  ctx.lineTo(W,cy+threeR*.67);
+  ctx.stroke();
+
+  ctx.beginPath();ctx.arc(leftX+keyW*.36,cy,7,0,Math.PI*2);ctx.stroke();
+  ctx.beginPath();ctx.arc(rightX+keyW*.64,cy,7,0,Math.PI*2);ctx.stroke();
+
+  // small lane marks
+  ctx.lineWidth=1.5;
+  for(let i=0;i<6;i++){
+    const yy=keyY+10+i*(keyH-20)/5;
+    ctx.beginPath();ctx.moveTo(leftX+keyW*.34,yy);ctx.lineTo(leftX+keyW*.42,yy);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(rightX+keyW*.58,yy);ctx.lineTo(rightX+keyW*.66,yy);ctx.stroke();
+  }
+}
+
+function draw(){
+  drawCourt();
+  drawings.forEach(o=>{
+    if(o.type==='line'||o.type==='arrow'){
+      ctx.strokeStyle=o.color||'#24304b';ctx.lineWidth=o.width||3;
+      ctx.beginPath();ctx.moveTo(o.x1*W,o.y1*H);ctx.lineTo(o.x2*W,o.y2*H);ctx.stroke();
+      if(o.type==='arrow'){
+        const a=Math.atan2((o.y2-o.y1)*H,(o.x2-o.x1)*W), len=13;
+        ctx.fillStyle=o.color||'#24304b';
+        ctx.beginPath();
+        ctx.moveTo(o.x2*W,o.y2*H);
+        ctx.lineTo(o.x2*W-len*Math.cos(a-.45),o.y2*H-len*Math.sin(a-.45));
+        ctx.lineTo(o.x2*W-len*Math.cos(a+.45),o.y2*H-len*Math.sin(a+.45));
+        ctx.closePath();ctx.fill();
+      }
+    }else if(o.type==='pen'){
+      ctx.strokeStyle=o.color||'#24304b';ctx.lineWidth=o.width||4;ctx.lineCap='round';
+      ctx.beginPath();o.points.forEach((p,i)=>i?ctx.lineTo(p.x*W,p.y*H):ctx.moveTo(p.x*W,p.y*H));ctx.stroke();
+      ctx.lineCap='butt';
+    }
+  });
+
+  players.forEach(p=>{
+    const x=p.x*W,y=p.y*H,r=Math.max(15,Math.min(W,H)*.027);
+    ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);
+    ctx.fillStyle=p.c;ctx.fill();
+    ctx.lineWidth=p.id===selectedPlayer?4:2;
+    ctx.strokeStyle=p.id===selectedPlayer?'#fff':'rgba(255,255,255,.75)';ctx.stroke();
+    ctx.fillStyle=(p.c==='#f4df00'||p.c==='#eee')?'#333':'#fff';
+    ctx.font=`800 ${Math.max(12,r*.9)}px Arial`;ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(p.n,x,y);
+  });
+}
+
+function renderPlayers(){
+  playersEl.innerHTML='';
+  players.forEach(p=>{
+    const b=document.createElement('button');
+    b.className='player';
+    b.textContent=p.n;b.style.background=p.c;
+    if(p.c==='#f4df00'||p.c==='#eee')b.style.color='#333';
+    b.onclick=()=>{selectedPlayer=p.id;selectedColor=p.c;setTool('select');draw()};
+    playersEl.appendChild(b);
+  });
+}
+
+function pos(e){
+  const r=canvas.getBoundingClientRect();
+  return {x:(e.clientX-r.left)/r.width,y:(e.clientY-r.top)/r.height};
+}
+function hitPlayer(pt){
+  const rr=Math.max(.035,35/W);
+  return [...players].reverse().find(p=>Math.hypot(p.x-pt.x,p.y-pt.y)<rr);
+}
+function snapshot(){history.push(JSON.stringify({players,drawings}));if(history.length>50)history.shift();future=[]}
+function setTool(t){
+  tool=t;
+  statusEl.textContent=t.toUpperCase();
+  document.querySelectorAll('.bottom-btn').forEach(x=>x.classList.remove('active'));
+  if(t==='arrow'||t==='line'||t==='pen')showHint('Clique e arraste para desenhar');
+}
+function setSelectedColor(c){
+  selectedColor=c;
+  if(selectedPlayer){
+    snapshot();
+    const p=players.find(x=>x.id===selectedPlayer);p.c=c;renderPlayers();draw();
+  }else showHint('Selecione um jogador para aplicar a cor');
+}
+function showHint(t){
+  hintEl.textContent=t;hintEl.classList.add('show');
+  clearTimeout(showHint.timer);showHint.timer=setTimeout(()=>hintEl.classList.remove('show'),1800);
+}
+
+canvas.addEventListener('pointerdown',e=>{
+  const pt=pos(e);
+  if(tool==='select'){
+    const p=hitPlayer(pt);
+    if(p){snapshot();selectedPlayer=p.id;drag={p,ox:pt.x-p.x,oy:pt.y-p.y};canvas.setPointerCapture(e.pointerId)}
+    else selectedPlayer=null;
+  }else if(tool==='line'||tool==='arrow'){
+    snapshot();current={type:tool,x1:pt.x,y1:pt.y,x2:pt.x,y2:pt.y,color:selectedColor,width:3};
+  }else if(tool==='pen'){
+    snapshot();current={type:'pen',points:[pt],color:selectedColor,width:4};
+  }else if(tool==='erase'){
+    const p=hitPlayer(pt);
+    if(p){snapshot();players.splice(players.findIndex(x=>x.id===p.id),1);renderPlayers()}
+    else{
+      const idx=drawings.findIndex(o=>{
+        if(o.type==='pen')return o.points.some(q=>Math.hypot(q.x-pt.x,q.y-pt.y)<.035);
+        return Math.hypot(((o.x1+o.x2)/2)-pt.x,((o.y1+o.y2)/2)-pt.y)<.06;
+      });
+      if(idx>=0){snapshot();drawings.splice(idx,1)}
+    }
+  }
+  draw();
+});
+canvas.addEventListener('pointermove',e=>{
+  const pt=pos(e);
+  if(drag){drag.p.x=Math.max(.03,Math.min(.97,pt.x-drag.ox));drag.p.y=Math.max(.04,Math.min(.96,pt.y-drag.oy));draw()}
+  if(current){
+    if(current.type==='pen')current.points.push(pt);
+    else{current.x2=pt.x;current.y2=pt.y}
+    draw(); drawCurrent();
+  }
+});
+canvas.addEventListener('pointerup',e=>{
+  if(drag){drag=null;renderPlayers()}
+  if(current){drawings.push(current);current=null;draw()}
+});
+canvas.addEventListener('pointerleave',()=>{if(drag)drag=null});
+
+function drawCurrent(){
+  if(!current)return;
+  ctx.strokeStyle=current.color;ctx.lineWidth=current.width;ctx.lineCap='round';
+  if(current.type==='pen'){
+    ctx.beginPath();current.points.forEach((p,i)=>i?ctx.lineTo(p.x*W,p.y*H):ctx.moveTo(p.x*W,p.y*H));ctx.stroke();
+  }else{
+    ctx.beginPath();ctx.moveTo(current.x1*W,current.y1*H);ctx.lineTo(current.x2*W,current.y2*H);ctx.stroke();
+    if(current.type==='arrow'){
+      const a=Math.atan2((current.y2-current.y1)*H,(current.x2-current.x1)*W),len=13;
+      ctx.fillStyle=current.color;ctx.beginPath();ctx.moveTo(current.x2*W,current.y2*H);
+      ctx.lineTo(current.x2*W-len*Math.cos(a-.45),current.y2*H-len*Math.sin(a-.45));
+      ctx.lineTo(current.x2*W-len*Math.cos(a+.45),current.y2*H-len*Math.sin(a+.45));ctx.closePath();ctx.fill();
+    }
+  }
+}
+function clearDrawings(){if(!drawings.length)return;snapshot();drawings=[];draw()}
+function resetBoard(){snapshot();drawings=[];players.splice(0,players.length,
+  {id:1,n:1,x:.18,y:.50,c:'#9e2c2c'},{id:2,n:2,x:.28,y:.36,c:'#f4df00'},
+  {id:3,n:3,x:.31,y:.64,c:'#8032d9'},{id:4,n:4,x:.44,y:.42,c:'#18c92d'},
+  {id:5,n:5,x:.48,y:.68,c:'#2f59a6'});selectedPlayer=null;renderPlayers();draw()}
+function undo(){
+  if(!history.length)return;
+  future.push(JSON.stringify({players,drawings}));
+  const s=JSON.parse(history.pop());
+  players.splice(0,players.length,...s.players);drawings=s.drawings;selectedPlayer=null;renderPlayers();draw();
+}
+function redo(){
+  if(!future.length)return;
+  history.push(JSON.stringify({players,drawings}));
+  const s=JSON.parse(future.pop());
+  players.splice(0,players.length,...s.players);drawings=s.drawings;renderPlayers();draw();
+}
+function saveBoard(){
+  localStorage.setItem('basketTacticBoard',JSON.stringify({players,drawings}));
+  showHint('Quadro salvo neste navegador');
+}
+function loadBoard(){
+  const s=localStorage.getItem('basketTacticBoard');
+  if(!s){showHint('Nenhum quadro salvo');return}
+  snapshot();const o=JSON.parse(s);
+  players.splice(0,players.length,...o.players);drawings=o.drawings;renderPlayers();draw();showHint('Quadro carregado');
+}
+function exportPNG(){
+  const link=document.createElement('a');link.download='jogada-basket.png';link.href=canvas.toDataURL('image/png');link.click();
+}
+function copyBoard(){
+  const data=btoa(unescape(encodeURIComponent(JSON.stringify({players,drawings}))));
+  navigator.clipboard?.writeText(location.href.split('#')[0]+'#'+data);
+  showHint('Link da jogada copiado');
+}
+function toggleFullscreen(){
+  if(!document.fullscreenElement)document.documentElement.requestFullscreen?.();
+  else document.exitFullscreen?.();
+}
+function resetView(){document.getElementById('zoom').value=100;zoom=1;wrap.style.transform='scale(1)'}
+document.getElementById('zoom').addEventListener('input',e=>{
+  zoom=e.target.value/100;wrap.style.transform=`scale(${zoom})`;
+});
+function showHelp(msg){
+  document.querySelector('.modal-card p').textContent=msg||'Crie jogadas arrastando jogadores, desenhando linhas e setas diretamente na quadra. Use salvar para guardar a jogada no navegador e exportar para gerar uma imagem.';
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal(){document.getElementById('modal').classList.remove('open')}
+document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
+document.getElementById('menuBtn').onclick=()=>showHelp('Atalhos: Seta = movimento, Linha = marcação, Caneta = desenho livre, Borracha = apagar, ↶/↷ = desfazer e refazer.');
+
+renderPlayers();
+resize();
+</script>
+</body>
+</html>
