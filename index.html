@@ -214,8 +214,8 @@
   <main class="login-container">
 
     <section class="profile">
-      <img src="perfil.jpg" alt="Perfil">
-      <h1>quadro tatico jao</h1>
+      <img src="JAO.png" alt="Perfil">
+      <h1>quadra tatico jao</h1>
     </section>
 
     <section class="login-box">
@@ -255,7 +255,7 @@
 
       <div class="divider">ou</div>
 
-      <button class="google-button" id="googleLogin">
+      <button class="google-button" id="googleLogin" type="button">
         <img
           src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
           alt=""
@@ -273,48 +273,57 @@
 
     <div class="signup">
       Ainda não possui uma conta?
-      <a href="#">Criar conta</a>
+      <<a href="cadastro.html">Criar conta</a>
     </div>
 
   </main>
 
   <script>
     const form = document.getElementById("loginForm");
-    const message = document.getElementById("message");
+const message = document.getElementById("message");
 
-    form.addEventListener("submit", function(event) {
-      event.preventDefault();
+form.addEventListener("submit", function(event) {
 
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
+  event.preventDefault();
 
-      /*
-        Aqui você deve conectar um serviço de autenticação,
-        como Firebase Authentication.
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
 
-        NÃO envie a senha para um servidor próprio em texto puro.
-      */
+  // Pega o usuário salvo no localStorage
+  const usuarioSalvo = localStorage.getItem("usuario");
 
-      if (!email || !password) {
-        message.style.display = "block";
-        message.style.color = "red";
-        message.textContent = "Preencha todos os campos.";
-        return;
-      }
+  if (!usuarioSalvo) {
+    message.style.display = "block";
+    message.style.color = "red";
+    message.textContent = "Nenhuma conta foi cadastrada.";
+    return;
+  }
 
-      message.style.display = "block";
-      message.style.color = "#555";
-      message.textContent = "Conectando...";
-    });
+  const usuario = JSON.parse(usuarioSalvo);
 
-    document.getElementById("googleLogin").addEventListener("click", function() {
-      /*
-        Aqui entra o Google OAuth/Firebase Authentication.
-      */
+  // Verifica e-mail e senha
+  if (email === usuario.email && password === usuario.password) {
 
-      alert("O login seguro com Google será iniciado aqui.");
-    });
+    message.style.display = "block";
+    message.style.color = "green";
+    message.textContent = "Login realizado!";
+
+    setTimeout(function() {
+      window.location.href = "verum.html";
+    }, 500);
+
+  } else {
+
+    message.style.display = "block";
+    message.style.color = "red";
+    message.textContent = "E-mail ou senha incorretos.";
     
+
+
+  }
+
+});
+
   </script>
 
 </body>
