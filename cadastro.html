@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Criar conta</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: #292830;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 430px;
+      text-align: center;
+    }
+
+    .profile img {
+      width: 125px;
+      height: 125px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 4px solid white;
+      margin-bottom: 15px;
+    }
+
+    .profile h1 {
+      color: white;
+      font-size: 28px;
+      font-weight: 400;
+      margin-bottom: 25px;
+    }
+
+    .box {
+      background: white;
+      border-radius: 12px;
+      padding: 28px 22px;
+      box-shadow: 0 8px 25px rgba(0,0,0,.2);
+    }
+
+    .box h2 {
+      font-size: 25px;
+      margin-bottom: 8px;
+    }
+
+    .box p {
+      color: #777;
+      font-size: 14px;
+      margin-bottom: 22px;
+    }
+
+    .input-group {
+      text-align: left;
+      margin-bottom: 16px;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 7px;
+      font-weight: bold;
+    }
+
+    .input-group input {
+      width: 100%;
+      height: 48px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 0 14px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    .input-group input:focus {
+      border-color: #555;
+    }
+
+    .button {
+      width: 100%;
+      height: 48px;
+      border: none;
+      border-radius: 8px;
+      background: #111;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .button:hover {
+      background: #333;
+    }
+
+    .message {
+      margin-top: 15px;
+      font-size: 14px;
+      display: none;
+    }
+
+    .back {
+      display: block;
+      margin-top: 20px;
+      color: white;
+      font-size: 14px;
+      text-decoration: none;
+    }
+
+    .back:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="container">
+
+    <section class="profile">
+      <img src="JAO.png" alt="Perfil">
+      <h1>quadra tatico jao</h1>
+    </section>
+
+    <section class="box">
+
+      <h2>Criar conta</h2>
+      <p>Cadastre-se para continuar</p>
+
+      <form id="registerForm">
+
+        <div class="input-group">
+          <label for="email">E-mail</label>
+
+          <input
+            type="email"
+            id="email"
+            placeholder="seu@email.com"
+            required
+          >
+        </div>
+
+        <div class="input-group">
+          <label for="password">Senha</label>
+
+          <input
+            type="password"
+            id="password"
+            placeholder="Digite sua senha"
+            required
+          >
+        </div>
+
+        <div class="input-group">
+          <label for="confirmPassword">Confirmar senha</label>
+
+          <input
+            type="password"
+            id="confirmPassword"
+            placeholder="Digite a senha novamente"
+            required
+          >
+        </div>
+
+        <button class="button" type="submit">
+          Cadastrar
+        </button>
+
+      </form>
+
+      <div id="message" class="message"></div>
+
+    </section>
+
+    <a href="login.html" class="back">
+      Já tenho uma conta
+    </a>
+
+  </main>
+
+  <script>
+    const form = document.getElementById("registerForm");
+    const message = document.getElementById("message");
+
+    form.addEventListener("submit", function(event) {
+
+      event.preventDefault();
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
+
+      // Verifica se as senhas são iguais
+      if (password !== confirmPassword) {
+
+        message.style.display = "block";
+        message.style.color = "red";
+        message.textContent = "As senhas não são iguais.";
+
+        return;
+      }
+
+      // Verifica tamanho da senha
+      if (password.length < 6) {
+
+        message.style.display = "block";
+        message.style.color = "red";
+        message.textContent = "A senha precisa ter pelo menos 6 caracteres.";
+
+        return;
+      }
+
+      // Cria o usuário
+      const usuario = {
+        email: email,
+        password: password
+      };
+
+      // Salva no navegador
+      localStorage.setItem("usuario", JSON.stringify(usuario));
+
+      message.style.display = "block";
+      message.style.color = "green";
+      message.textContent = "Conta criada com sucesso!";
+
+      // Volta para a página inicial
+      setTimeout(function() {
+        window.location.href = "index.html";
+      }, 1000);
+
+    });
+  </script>
+
+</body>
+</html>
