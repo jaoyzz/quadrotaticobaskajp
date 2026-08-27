@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: #292830;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      color: #222;
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 430px;
+      background: #292830;
+      text-align: center;
+    }
+
+    .profile {
+      margin-bottom: 25px;
+    }
+
+    .profile img {
+      width: 125px;
+      height: 125px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 4px solid white;
+      margin-bottom: 15px;
+    }
+
+    .profile h1 {
+      color: white;
+      font-size: 28px;
+      font-weight: 400;
+    }
+
+    .login-box {
+      background: white;
+      border-radius: 12px;
+      padding: 28px 22px;
+      box-shadow: 0 8px 25px rgba(0,0,0,.2);
+    }
+
+    .login-box h2 {
+      font-size: 25px;
+      margin-bottom: 8px;
+    }
+
+    .login-box p {
+      color: #777;
+      font-size: 14px;
+      margin-bottom: 22px;
+    }
+
+    .input-group {
+      text-align: left;
+      margin-bottom: 16px;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 7px;
+      font-weight: bold;
+    }
+
+    .input-group input {
+      width: 100%;
+      height: 48px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 0 14px;
+      font-size: 16px;
+      outline: none;
+      transition: .2s;
+    }
+
+    .input-group input:focus {
+      border-color: #555;
+      box-shadow: 0 0 0 3px rgba(0,0,0,.08);
+    }
+
+    .login-button {
+      width: 100%;
+      height: 48px;
+      border: none;
+      border-radius: 8px;
+      background: #111;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .login-button:hover {
+      background: #333;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 22px 0;
+      color: #999;
+      font-size: 13px;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: #ddd;
+    }
+
+    .google-button {
+      width: 100%;
+      height: 48px;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 15px;
+      font-weight: bold;
+    }
+
+    .google-button img {
+      width: 20px;
+      height: 20px;
+    }
+
+    .forgot {
+      display: block;
+      margin-top: 18px;
+      color: #444;
+      font-size: 14px;
+      text-decoration: none;
+    }
+
+    .signup {
+      color: white;
+      margin-top: 20px;
+      font-size: 14px;
+    }
+
+    .signup a {
+      color: white;
+      font-weight: bold;
+    }
+
+    .message {
+      margin-top: 15px;
+      font-size: 14px;
+      display: none;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 15px;
+        align-items: flex-start;
+        padding-top: 40px;
+      }
+
+      .profile img {
+        width: 105px;
+        height: 105px;
+      }
+
+      .profile h1 {
+        font-size: 24px;
+      }
+
+      .login-box {
+        padding: 24px 18px;
+      }
+    }
+
+    @media (max-width: 340px) {
+      .login-box h2 {
+        font-size: 21px;
+      }
+
+      .input-group input,
+      .login-button,
+      .google-button {
+        height: 45px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="login-container">
+
+    <section class="profile">
+      <img src="perfil.jpg" alt="Perfil">
+      <h1>quadro tatico jao</h1>
+    </section>
+
+    <section class="login-box">
+
+      <h2>Bem-vindo!</h2>
+      <p>Entre na sua conta para continuar</p>
+
+      <form id="loginForm">
+
+        <div class="input-group">
+          <label for="email">E-mail</label>
+          <input
+            type="email"
+            id="email"
+            placeholder="seu@email.com"
+            autocomplete="email"
+            required
+          >
+        </div>
+
+        <div class="input-group">
+          <label for="password">Senha</label>
+          <input
+            type="password"
+            id="password"
+            placeholder="Digite sua senha"
+            autocomplete="current-password"
+            required
+          >
+        </div>
+
+        <button class="login-button" type="submit">
+          Entrar
+        </button>
+
+      </form>
+
+      <div class="divider">ou</div>
+
+      <button class="google-button" id="googleLogin">
+        <img
+          src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+          alt=""
+        >
+        Continuar com Google
+      </button>
+
+      <a href="#" class="forgot">
+        Esqueci minha senha
+      </a>
+
+      <div id="message" class="message"></div>
+
+    </section>
+
+    <div class="signup">
+      Ainda não possui uma conta?
+      <a href="#">Criar conta</a>
+    </div>
+
+  </main>
+
+  <script>
+    const form = document.getElementById("loginForm");
+    const message = document.getElementById("message");
+
+    form.addEventListener("submit", function(event) {
+      event.preventDefault();
+
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      /*
+        Aqui você deve conectar um serviço de autenticação,
+        como Firebase Authentication.
+
+        NÃO envie a senha para um servidor próprio em texto puro.
+      */
+
+      if (!email || !password) {
+        message.style.display = "block";
+        message.style.color = "red";
+        message.textContent = "Preencha todos os campos.";
+        return;
+      }
+
+      message.style.display = "block";
+      message.style.color = "#555";
+      message.textContent = "Conectando...";
+    });
+
+    document.getElementById("googleLogin").addEventListener("click", function() {
+      /*
+        Aqui entra o Google OAuth/Firebase Authentication.
+      */
+
+      alert("O login seguro com Google será iniciado aqui.");
+    });
+    
+  </script>
+
+</body>
+</html>
